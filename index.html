@@ -146,6 +146,44 @@ pt>
       }
     }
   </script>
+
+<script>
+async function submitPrompt() {
+  const input = document.getElementById('userInput');
+  const messages = document.getElementById('messages');
+  const userText = input.value.trim();
+  if (!userText) return;
+
+  const userMsg = document.createElement('div');
+  userMsg.className = 'message user';
+  userMsg.textContent = `You: ${userText}`;
+  messages.appendChild(userMsg);
+
+  input.value = '';
+
+  const assistantMsg = document.createElement('div');
+  assistantMsg.className = 'message assistant';
+  assistantMsg.textContent = 'BuildBot is generating your site code...';
+  messages.appendChild(assistantMsg);
+
+  messages.scrollTop = messages.scrollHeight;
+
+  try {
+    const res = await fetch("/api/buildbot", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userInput: userText })
+    });
+
+    const data = await res.json();
+    assistantMsg.textContent = data.reply;
+  } catch (err) {
+    assistantMsg.textContent = '❌ Error reaching BuildBot.';
+    console.error(err);
+  }
+}
+</script>
+
 </body>
 </html>
 
